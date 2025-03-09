@@ -31,6 +31,7 @@ class Player:
             ],
             "jump": [pygame.image.load("assets/peach/jum.png")],
             "fall": [pygame.image.load("assets/peach/fallDown.png")],
+            "fall_left": [pygame.image.load("assets/peach/left_falldown.png")],
             "dead": [pygame.image.load("assets/peach/killed.png")]
         }
         
@@ -72,7 +73,10 @@ class Player:
 
         # Determinar sprite a usar
         if not self.on_ground:
-            self.image = self.sprites["jump"][0] if self.velocity_y < 0 else self.sprites["fall"][0]
+            if self.direction == "left":
+                self.image = self.sprites["fall_left"][0]
+            else:
+                self.image = self.sprites["jump"][0] if self.velocity_y < 0 else self.sprites["fall"][0]
         else:
             if keys[pygame.K_LEFT]:
                 self.frame_index %= len(self.sprites["walk_left"])
