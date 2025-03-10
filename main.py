@@ -29,7 +29,7 @@ platforms = [
 ]
 
 # Crear enemigo (Goomba)
-enemies = [Enemy(320, HEIGHT - 110, speed=2, size=(30, 30), frames_folder="assets/goomba/")]
+enemies = [Enemy(320, HEIGHT - 110, speed=2, size=(40, 40), frames_folder="assets/goomba/")]
 
 # Lista de monedas generadas
 coins = []
@@ -114,6 +114,17 @@ while running:
     # Mostrar contador de monedas
     score_text = font.render(f"Monedas: {score}", True, (255, 255, 0))
     screen.blit(score_text, (20, 20))
+
+        # Manejo de eventos
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:    
+            running = False
+        if event.type == pygame.MOUSEBUTTONDOWN and not player.alive:
+            if button_rect.collidepoint(event.pos):
+                player.reset()
+                for enemy in enemies:
+                    enemy.__init__(enemy.rect.x, enemy.rect.y)  # Reinicia Goomba
+
 
     # Mostrar botón "Volver a Jugar" si el jugador muere
     if not player.alive:

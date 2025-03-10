@@ -49,7 +49,7 @@ class Enemy:
             self.frame_index += self.animation_speed
             if self.frame_index >= len(self.frames):
                 self.frame_index = 0
-            self.image = self.frames[int(self.frame_index)]  # Mantener tamaño original
+            self.image = self.frames[int(self.frame_index)]
 
     def die(self):
         """Mata al enemigo y activa la animación de muerte"""
