@@ -21,6 +21,16 @@ class Flag:
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
 
+# Clase Lava: similar a Platform pero con efecto de muerte
+class Lava:
+    def __init__(self, x, y, width, height, image_path="assets/lava.png"):
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect.topleft)
+
 # Inicializar pygame
 pygame.init()
 
@@ -57,25 +67,32 @@ platforms2 = [
     Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo1.png"),
 
     # Fila inferior (4 bloques)
-    Platform(450, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
-    Platform(500, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
-    Platform(550, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
-    Platform(600, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
+    Platform(250, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
+    Platform(300, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
+    Platform(350, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
+    Platform(400, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
 
     # Segunda fila (3 bloques)
-    Platform(500, HEIGHT - 160, 50, 40, "assets/brick.jpg"),
-    Platform(550, HEIGHT - 160, 50, 40, "assets/brick.jpg"),
-    Platform(600, HEIGHT - 160, 50, 40, "assets/brick.jpg"),
+    Platform(300, HEIGHT - 160, 50, 40, "assets/brick.jpg"),  # Moved left
+    Platform(350, HEIGHT - 160, 50, 40, "assets/brick.jpg"),  # Moved left
+    Platform(400, HEIGHT - 160, 50, 40, "assets/brick.jpg"),  # Moved left
 
     # Tercera fila (2 bloques)
-    Platform(550, HEIGHT - 200, 50, 40, "assets/brick.jpg"),
-    Platform(600, HEIGHT - 200, 50, 40, "assets/brick.jpg"),
+    Platform(350, HEIGHT - 200, 50, 40, "assets/brick.jpg"),  # Moved left
+    Platform(400, HEIGHT - 200, 50, 40, "assets/brick.jpg"),  # Moved left
 
     # Fila superior (1 bloque)
-    Platform(600, HEIGHT - 240, 50, 40, "assets/brick.jpg"),
+    Platform(400, HEIGHT - 240, 50, 40, "assets/brick.jpg"),  # Moved left
 ]
+# Agregar lava
+lava_start_x = 455  # Ajusta esta posición según donde terminan las plataformas
+lava_width = 250    # Ajusta este ancho para que termine al final del suelo
+lava_height = 80    # Ajusta esta altura para que sea más alta
+lava = Lava(lava_start_x, HEIGHT - 100, lava_width, lava_height, "assets/lava.png")
+
+
 # Crear la bandera estática en la Pantalla 2
-flag = Flag(700, HEIGHT - 80 - 250, size=(100, 250), image_path="assets/flag.png")
+flag = Flag(700, HEIGHT - 80 - 240, size=(100, 250), image_path="assets/flag.png")
 
 # Jugador y variables de juego
 player = Player(100, HEIGHT - 150)
@@ -173,12 +190,32 @@ while running:
         for plat in platforms2:
             plat.draw(screen)
 
+        # Dibujar lava
+        lava.draw(screen)
+
         # Bandera
         flag.update()
         flag.draw(screen)
 
         if player.alive:
-            player.update(platforms2, [], [])
+            player.update(platforms2, [], [])  # Actualizar jugador con plataformas de pantalla 2
+            for plat in platforms2:
+                if player.rect.colliderect(plat.rect):
+                    if player.velocity_y > 0:  # Si el jugador está cayendo
+                        player.rect.bottom = plat.rect.top
+                        player.velocity_y = 0
+                    elif player.velocity_y < 0:  # Si el jugador está subiendo
+                        player.rect.top = plat.rect.bottom
+                        player.velocity_y = 0
+                    if player.rect.right > plat.rect.left and player.rect.left < plat.rect.right:
+                        player.rect.right = plat.rect.left
+                    elif player.rect.left < plat.rect.right and player.rect.right > plat.rect.left:
+                        player.rect.left = plat.rect.right
+
+            # Verificar colisión con la lava
+            if player.rect.colliderect(lava.rect):
+                player.alive = False
+
         player.draw(screen)
 
         # Puntaje
@@ -192,8 +229,11 @@ while running:
 
     # --- Victoria ---
     if win:
-        # Actualizar y dibujar a Peach con su animación de victoria
-        player.update(platforms2, [], [])
+        # No llenar la pantalla de negro, solo mostrar el mensaje de victoria
+        victory_text = font.render("¡Ganaste!", True, (255, 255, 0))
+        screen.blit(victory_text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
+        
+        player.draw(screen)  # Dibujar el sprite de victor        player.update(platforms2, [], [])
         player.draw(screen)
 
     # Botón "Volver a Jugar" si Peach muere y no hay victoria

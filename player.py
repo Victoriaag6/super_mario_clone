@@ -189,11 +189,3 @@ class Player:
 
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
-        if self.is_winning:
-            self.draw_win_message(screen)
-
-    def draw_win_message(self, screen):
-        """Dibuja el mensaje de victoria en la pantalla"""
-        font = pygame.font.Font(None, 74)
-        text = font.render("¡Ganaste!", True, (255, 255, 255))
-        screen.blit(text, (self.rect.x, self.rect.y - 50))
