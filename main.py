@@ -55,7 +55,7 @@ enemies1 = [
     Enemy(320, HEIGHT - 120, speed=2, size=(40, 40), frames_folder="assets/goomba/")
 ]
 
-coin_blocks1 = [CoinBlock(500, 350, 40, 40)]
+coin_blocks1 = [CoinBlock(510, 350, 40, 40)]
 coins = []
 
 # --- PANTALLA 2 (Final) ---
@@ -67,25 +67,25 @@ platforms2 = [
     Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo1.png"),
 
     # Fila inferior (4 bloques)
+    Platform(200, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
     Platform(250, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
     Platform(300, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
     Platform(350, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
-    Platform(400, HEIGHT - 120, 50, 40, "assets/brick.jpg"),  # Moved left
 
     # Segunda fila (3 bloques)
+    Platform(260, HEIGHT - 160, 50, 40, "assets/brick.jpg"),  # Moved left
     Platform(300, HEIGHT - 160, 50, 40, "assets/brick.jpg"),  # Moved left
     Platform(350, HEIGHT - 160, 50, 40, "assets/brick.jpg"),  # Moved left
-    Platform(400, HEIGHT - 160, 50, 40, "assets/brick.jpg"),  # Moved left
 
     # Tercera fila (2 bloques)
+    Platform(300, HEIGHT - 200, 50, 40, "assets/brick.jpg"),  # Moved left
     Platform(350, HEIGHT - 200, 50, 40, "assets/brick.jpg"),  # Moved left
-    Platform(400, HEIGHT - 200, 50, 40, "assets/brick.jpg"),  # Moved left
 
     # Fila superior (1 bloque)
-    Platform(400, HEIGHT - 240, 50, 40, "assets/brick.jpg"),  # Moved left
+    Platform(350, HEIGHT - 240, 50, 40, "assets/brick.jpg"),  # Moved left
 ]
 # Agregar lava
-lava_start_x = 455  # Ajusta esta posición según donde terminan las plataformas
+lava_start_x = 430  # Ajusta esta posición según donde terminan las plataformas
 lava_width = 250    # Ajusta este ancho para que termine al final del suelo
 lava_height = 80    # Ajusta esta altura para que sea más alta
 lava = Lava(lava_start_x, HEIGHT - 100, lava_width, lava_height, "assets/lava.png")
