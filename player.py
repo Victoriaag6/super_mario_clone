@@ -8,43 +8,43 @@ ANIMATION_SPEED = 0.15
 DEATH_ANIMATION_SPEED = 10  # Retraso entre frames de muerte
 
 class Player:
-    def __init__(self, x, y):
+    def __init__(self, x, y, size=(60, 80)):  # Tamaño aumentado de Peach
         self.start_x = x
         self.start_y = y
-        
-        # Cargar sprites desde la carpeta assets/peach/
+        self.size = size  # Nuevo tamaño de Peach
+
+        # Cargar y escalar sprites desde la carpeta assets/peach/
         self.sprites = {
-            "idle": [pygame.image.load("assets/peach/stand1.png")],
+            "idle": [self.scale_image("assets/peach/stand1.png")],
             "walk_right": [
-                pygame.image.load("assets/peach/moveRight1.png"),
-                pygame.image.load("assets/peach/moveRight2and4.png"),
-                pygame.image.load("assets/peach/moveRight3.png"),
-                pygame.image.load("assets/peach/moveRight2and4.png"),
-                pygame.image.load("assets/peach/moveRight5.png"),
-                pygame.image.load("assets/peach/moveRight6.png"),
-                pygame.image.load("assets/peach/moveRight7.png")
+                self.scale_image("assets/peach/moveRight1.png"),
+                self.scale_image("assets/peach/moveRight2and4.png"),
+                self.scale_image("assets/peach/moveRight3.png"),
+                self.scale_image("assets/peach/moveRight2and4.png"),
+                self.scale_image("assets/peach/moveRight5.png"),
+                self.scale_image("assets/peach/moveRight6.png"),
+                self.scale_image("assets/peach/moveRight7.png")
             ],
             "walk_left": [
-                pygame.image.load("assets/peach/moveLeft1.png"),
-                pygame.image.load("assets/peach/moveLeft2and4.png"),
-                pygame.image.load("assets/peach/moveLeft3.png"),
-                pygame.image.load("assets/peach/moveLeft2and4.png"),
-                pygame.image.load("assets/peach/moveLeft5.png"),
-                pygame.image.load("assets/peach/moveLeft6.png"),
-                pygame.image.load("assets/peach/moveLeft7.png")
+                self.scale_image("assets/peach/moveLeft1.png"),
+                self.scale_image("assets/peach/moveLeft2and4.png"),
+                self.scale_image("assets/peach/moveLeft3.png"),
+                self.scale_image("assets/peach/moveLeft2and4.png"),
+                self.scale_image("assets/peach/moveLeft5.png"),
+                self.scale_image("assets/peach/moveLeft6.png"),
+                self.scale_image("assets/peach/moveLeft7.png")
             ],
-            "jump": [pygame.image.load("assets/peach/jum.png")],
-            "fall": [pygame.image.load("assets/peach/fallDown.png")],
-            "fall_left": [pygame.image.load("assets/peach/left_falldown.png")],
+            "jump": [self.scale_image("assets/peach/jum.png")],
+            "fall": [self.scale_image("assets/peach/fallDown.png")],
+            "fall_left": [self.scale_image("assets/peach/left_falldown.png")],
             "dead": [
-                pygame.image.load("assets/peach/killed1.png"),
-                pygame.image.load("assets/peach/killed2.png"),
-                pygame.image.load("assets/peach/killed3.png"),
-                pygame.image.load("assets/peach/killed4.png"),
-                pygame.image.load("assets/peach/killed.png"),
+                self.scale_image("assets/peach/killed1.png"),
+                self.scale_image("assets/peach/killed2.png"),
+                self.scale_image("assets/peach/killed3.png"),
+                self.scale_image("assets/peach/killed4.png"),
             ]
         }
-        
+
         self.image = self.sprites["idle"][0]
         self.rect = self.image.get_rect(topleft=(x, y))
         self.velocity_y = 0
@@ -58,14 +58,20 @@ class Player:
         self.death_frame = 0
         self.death_timer = 0
 
-    def update(self, platforms, enemies):
+    def scale_image(self, path):
+        """Carga y escala una imagen al tamaño aumentado de Peach"""
+        image = pygame.image.load(path)
+        return pygame.transform.scale(image, self.size)
+
+    def update(self, platforms, blocks, enemies):  # Se añade enemies
         """Actualizar estado del personaje y manejar animaciones"""
         if self.is_dying:
             self.death_animation()
             return
         
         keys = pygame.key.get_pressed()
-        
+
+        # Movimiento horizontal
         if keys[pygame.K_LEFT]:
             self.rect.x -= SPEED
             self.direction = "left"
@@ -77,29 +83,37 @@ class Player:
         else:
             self.frame_index = 0
 
-        if keys[pygame.K_SPACE] and self.on_ground:
+        # Verificar si hay un obstáculo arriba antes de permitir el salto
+        if keys[pygame.K_SPACE] and self.on_ground and not self.has_obstacle_above(blocks, platforms):
             self.velocity_y = JUMP_POWER
             self.on_ground = False
 
+        # Aplicar gravedad
         self.velocity_y += GRAVITY
         self.rect.y += self.velocity_y
 
-        # Verificar colisiones con plataformas
+        # Verificar colisiones con plataformas y bloques
         self.on_ground = False
-        for platform in platforms:
-            if self.rect.colliderect(platform.rect):
-                self.rect.y = platform.rect.top - self.rect.height
-                self.velocity_y = 0
-                self.on_ground = True
-        
-        # Verificar colisiones con enemigos
-        for enemy in enemies:
-            if self.rect.colliderect(enemy.rect):
-                if self.velocity_y > 0 and self.rect.bottom - enemy.rect.top < 10:  # Peach cae sobre el enemigo
-                    self.velocity_y = JUMP_POWER  # Rebote tras eliminar al enemigo
-                    enemy.die()
-                else:
-                    self.die()
+        for obj in platforms + blocks:
+            if self.rect.colliderect(obj.rect):
+                if self.velocity_y > 0:  # Si está cayendo
+                    self.rect.bottom = obj.rect.top
+                    self.velocity_y = 0
+                    self.on_ground = True
+                elif self.velocity_y < 0:  # Si está saltando, bloquear el paso
+                    self.rect.top = obj.rect.bottom
+                    self.velocity_y = 0
+
+            # Verificar colisiones con enemigos
+            for enemy in enemies:
+                if self.rect.colliderect(enemy.rect):
+                    if self.velocity_y > 0 and self.rect.bottom - enemy.rect.top < 10:  # Peach cae sobre el enemigo
+                        self.velocity_y = JUMP_POWER  # Rebote tras eliminar al enemigo
+                        if hasattr(enemy, "die"):
+                            enemy.die()
+                    else:
+                        self.die()
+
 
         # Determinar sprite a usar
         if not self.on_ground:
@@ -116,6 +130,13 @@ class Player:
                 self.image = self.sprites["walk_right"][int(self.frame_index)]
             else:
                 self.image = self.sprites["idle"][0]
+
+    def has_obstacle_above(self, blocks, platforms):
+        """Verifica si hay un bloque o plataforma justo encima de Peach"""
+        for obj in blocks + platforms:
+            if obj.rect.colliderect(pygame.Rect(self.rect.x, self.rect.y - 10, self.rect.width, self.rect.height)):
+                return True
+        return False
     
     def die(self):
         """Manejar la muerte del personaje con animación."""
