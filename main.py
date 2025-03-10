@@ -16,20 +16,21 @@ FPS = 60
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Super Mario Clone")
 
-# Cargar fondo del nivel
-background = pygame.image.load("assets/fondo.jpg")
+# Cargar fondo del nivel y escalarlo al tamaño de la pantalla
+background = pygame.image.load("assets/fondo2.png")
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 # Crear jugador
 player = Player(100, HEIGHT - 150)
 
 # Crear plataformas
 platforms = [
-    Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo.jpg"),  # Suelo principal
+    Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo1.png"),  # Suelo principal
     Platform(250, 350, 300, 40, "assets/brick.jpg")           # Plataforma flotante
 ]
 
 # Crear enemigo (Goomba)
-enemies = [Enemy(320, HEIGHT - 110, speed=2, size=(40, 40), frames_folder="assets/goomba/")]
+enemies = [Enemy(320, HEIGHT - 120, speed=2, size=(40, 40), frames_folder="assets/goomba/")]
 
 # Lista de monedas generadas
 coins = []
