@@ -7,7 +7,7 @@ from coin_block import CoinBlock
 
 # Clase Flag: bandera estática
 class Flag:
-    def __init__(self, x, y, size=(60, 120), image_path="assets/flag.png"):
+    def __init__(self, x, y, size=(60, 180), image_path="assets/flag.png"):
         self.x = x
         self.y = y
         self.size = size
@@ -16,8 +16,7 @@ class Flag:
         self.rect = self.image.get_rect(topleft=(x, y))
 
     def update(self):
-        # No hay animación, así que no se necesita actualizar nada
-        pass
+        pass  # Sin animación en la bandera estática
 
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
@@ -39,14 +38,14 @@ background1 = pygame.transform.scale(background1, (WIDTH, HEIGHT))
 
 platforms1 = [
     Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo1.png"),  # Suelo principal
-    Platform(250, 350, 300, 40, "assets/brick.jpg")            # Plataforma flotante
+    Platform(250, 350, 260, 40, "assets/brick.jpg")            # Plataforma flotante
 ]
 
 enemies1 = [
     Enemy(320, HEIGHT - 120, speed=2, size=(40, 40), frames_folder="assets/goomba/")
 ]
 
-coin_blocks1 = [CoinBlock(550, 350, 40, 40)]
+coin_blocks1 = [CoinBlock(500, 350, 40, 40)]
 coins = []
 
 # --- PANTALLA 2 (Final) ---
@@ -58,7 +57,7 @@ platforms2 = [
 ]
 
 # Crear la bandera estática en la Pantalla 2
-flag = Flag(600, HEIGHT - 200, size=(60, 120), image_path="assets/flag.png")
+flag = Flag(600, HEIGHT - 200, size=(60, 180), image_path="assets/flag.png")
 
 # Jugador y variables de juego
 player = Player(100, HEIGHT - 150)
@@ -81,7 +80,7 @@ running = True
 while running:
     clock.tick(FPS)
 
-    # --- Manejo de eventos ---
+    # Manejo de eventos
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -89,6 +88,7 @@ while running:
         # Si Peach muere, botón de reinicio
         if event.type == pygame.MOUSEBUTTONDOWN and not player.alive and not win:
             if button_rect.collidepoint(event.pos):
+                # Reiniciar todo
                 player.reset()
                 score = 0
                 win = False
@@ -98,34 +98,36 @@ while running:
                     enemy.reset()
                 coins.clear()
 
-    # --- Lógica de Pantalla 1 ---
+    # --- PANTALLA 1 ---
     if current_screen == 1 and not win:
-        # Dibujar fondo
+        # Fondo
         screen.blit(background1, (0, 0))
 
-        # Verificar colisión con bloques de monedas (golpe desde abajo)
+        # Bloques de monedas
         for block in coin_blocks1:
             if player.rect.colliderect(block.rect) and player.velocity_y < 0:
                 new_coin = block.hit()
                 if new_coin:
                     coins.append(new_coin)
 
-        # Actualizar y dibujar si Peach está viva
+        # Actualizaciones si Peach está viva
         if player.alive:
             player.update(platforms1, coin_blocks1, enemies1)
             for enemy in enemies1:
-                enemy.update()  # Eliminar el argumento platforms1
-                # Cambiar dirección si el enemigo se sale de los límites de la plataforma
+                enemy.update()  
+                # Cambiar dirección si choca borde de la plataforma
                 for plat in platforms1:
                     if enemy.rect.left <= plat.rect.left or enemy.rect.right >= plat.rect.right:
                         enemy.change_direction()
+
+            # Monedas
             for coin in coins:
                 coin.update()
                 if player.rect.colliderect(coin.rect) and not coin.collected:
                     coin.collect()
                     score += 10
 
-            # Dibujar elementos de la pantalla 1
+            # Dibujar
             for plat in platforms1:
                 plat.draw(screen)
             for block in coin_blocks1:
@@ -136,42 +138,51 @@ while running:
                 enemy.draw(screen)
         player.draw(screen)
 
-        # Mostrar puntaje
+        # Puntaje
         score_text = font.render(f"Monedas: {score}", True, (255, 255, 0))
         screen.blit(score_text, (20, 20))
 
-        # Cambiar a Pantalla 2 si Peach llega al borde derecho
+        # Pasar a Pantalla 2
         if player.rect.x >= WIDTH - 50:
             current_screen = 2
             player.rect.x = 50
             player.rect.y = HEIGHT - 150
 
-    # --- Lógica de Pantalla 2 (Final) ---
+    # --- PANTALLA 2 ---
     elif current_screen == 2 and not win:
+        # Fondo
         screen.blit(background2, (0, 0))
         for plat in platforms2:
             plat.draw(screen)
-        # Actualizar y dibujar la bandera estática
+
+        # Bandera
         flag.update()
         flag.draw(screen)
+
         if player.alive:
-            player.update(platforms2, [], [])  # Sin bloques ni enemigos en la segunda pantalla
+            player.update(platforms2, [], [])
         player.draw(screen)
+
+        # Puntaje
         score_text = font.render(f"Monedas: {score}", True, (255, 255, 0))
         screen.blit(score_text, (20, 20))
-        # Verificar si Peach toca la bandera para ganar
+
+        # Verificar si toca la bandera
         if player.rect.colliderect(flag.rect):
             win = True
-            player.win()  # Activar animación de victoria
+            player.win()  # <-- AQUÍ llamas a la animación de victoria del jugador
 
-    # --- Lógica de Victoria ---
+    # --- Victoria ---
     if win:
-        # No llenar la pantalla de negro, solo mostrar el mensaje de victoria
+        # Muestra un solo “¡Ganaste!” con el fondo de Pantalla 2 visible
         victory_text = font.render("¡Ganaste!", True, (255, 255, 0))
         screen.blit(victory_text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
-        player.draw(screen)  # Dibujar el sprite de victoria
 
-    # Mostrar botón "Volver a Jugar" si Peach muere y no hay victoria
+        # Actualizar y dibujar a Peach con su animación de victoria
+        player.update(platforms2, [], [])
+        player.draw(screen)
+
+    # Botón "Volver a Jugar" si Peach muere y no hay victoria
     if not player.alive and not win:
         pygame.draw.rect(screen, BUTTON_COLOR, button_rect, border_radius=10)
         text = font.render("Volver a Jugar", True, TEXT_COLOR)
