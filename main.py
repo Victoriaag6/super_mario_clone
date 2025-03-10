@@ -35,7 +35,7 @@ enemies = [Enemy(320, HEIGHT - 110, speed=2, size=(40, 40), frames_folder="asset
 coins = []
 
 # Crear bloques de monedas
-coin_blocks = [CoinBlock(400, 310, 40, 40)]
+coin_blocks = [CoinBlock(550, 350, 40, 40)]
 
 # Contador de monedas
 score = 0

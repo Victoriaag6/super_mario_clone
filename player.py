@@ -5,6 +5,7 @@ GRAVITY = 0.5
 JUMP_POWER = -15  # Aumentamos la altura del salto
 SPEED = 5
 ANIMATION_SPEED = 0.15
+DEATH_ANIMATION_SPEED = 10  # Retraso entre frames de muerte
 
 class Player:
     def __init__(self, x, y, size=(60, 80)):
@@ -52,6 +53,11 @@ class Player:
         self.direction = "right"
         self.alive = True
 
+        # Variables para la animación de muerte
+        self.is_dying = False
+        self.death_frame = 0
+        self.death_timer = 0
+
     def scale_image(self, path):
         """Carga y escala una imagen al tamaño de Peach"""
         image = pygame.image.load(path)
@@ -59,6 +65,10 @@ class Player:
 
     def update(self, platforms, coin_blocks, enemies):
         """Actualizar estado del personaje"""
+        if self.is_dying:
+            self.death_animation()
+            return
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_LEFT]:
@@ -114,8 +124,22 @@ class Player:
                 self.image = self.sprites["idle"][0]
 
     def die(self):
-        """Manejar la muerte del personaje"""
-        self.alive = False
+        """Inicia la animación de muerte"""
+        self.is_dying = True
+        self.death_frame = 0
+        self.death_timer = 0
+        self.velocity_y = 0  # Detiene el movimiento
+
+    def death_animation(self):
+        """Ejecuta la animación de muerte cuadro a cuadro."""
+        self.death_timer += 1
+        if self.death_timer % DEATH_ANIMATION_SPEED == 0:
+            if self.death_frame < len(self.sprites["dead"]) - 1:
+                self.death_frame += 1
+            else:
+                self.alive = False  # Marcamos como muerto al final de la animación
+
+        self.image = self.sprites["dead"][self.death_frame]
 
     def reset(self):
         """Reinicia el personaje tras la muerte"""
@@ -123,6 +147,9 @@ class Player:
         self.velocity_y = 0
         self.on_ground = False
         self.alive = True
+        self.is_dying = False
+        self.death_frame = 0
+        self.death_timer = 0
         self.image = self.sprites["idle"][0]
 
     def draw(self, screen):
