@@ -53,11 +53,29 @@ background2 = pygame.image.load("assets/fondo2.png")
 background2 = pygame.transform.scale(background2, (WIDTH, HEIGHT))
 
 platforms2 = [
-    Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo1.png")  # Suelo final
-]
+    # Suelo final
+    Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo1.png"),
 
+    # Fila inferior (4 bloques)
+    Platform(450, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
+    Platform(500, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
+    Platform(550, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
+    Platform(600, HEIGHT - 120, 50, 40, "assets/brick.jpg"),
+
+    # Segunda fila (3 bloques)
+    Platform(500, HEIGHT - 160, 50, 40, "assets/brick.jpg"),
+    Platform(550, HEIGHT - 160, 50, 40, "assets/brick.jpg"),
+    Platform(600, HEIGHT - 160, 50, 40, "assets/brick.jpg"),
+
+    # Tercera fila (2 bloques)
+    Platform(550, HEIGHT - 200, 50, 40, "assets/brick.jpg"),
+    Platform(600, HEIGHT - 200, 50, 40, "assets/brick.jpg"),
+
+    # Fila superior (1 bloque)
+    Platform(600, HEIGHT - 240, 50, 40, "assets/brick.jpg"),
+]
 # Crear la bandera estática en la Pantalla 2
-flag = Flag(600, HEIGHT - 200, size=(60, 180), image_path="assets/flag.png")
+flag = Flag(700, HEIGHT - 80 - 250, size=(100, 250), image_path="assets/flag.png")
 
 # Jugador y variables de juego
 player = Player(100, HEIGHT - 150)
@@ -174,10 +192,6 @@ while running:
 
     # --- Victoria ---
     if win:
-        # Muestra un solo “¡Ganaste!” con el fondo de Pantalla 2 visible
-        victory_text = font.render("¡Ganaste!", True, (255, 255, 0))
-        screen.blit(victory_text, (WIDTH // 2 - 60, HEIGHT // 2 - 20))
-
         # Actualizar y dibujar a Peach con su animación de victoria
         player.update(platforms2, [], [])
         player.draw(screen)
