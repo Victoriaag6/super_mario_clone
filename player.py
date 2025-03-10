@@ -45,6 +45,17 @@ class Player:
             ]
         }
 
+        # Añadir sprites de victoria
+        self.sprites["win"] = [
+            self.scale_image("assets/peach/win1and6.png"),
+            self.scale_image("assets/peach/win2and7.png"),
+            self.scale_image("assets/peach/win3.png"),
+            self.scale_image("assets/peach/win4.png"),
+            self.scale_image("assets/peach/win5.png"),
+            self.scale_image("assets/peach/win1and6.png"),
+            self.scale_image("assets/peach/win2and7.png")
+        ]
+
         self.image = self.sprites["idle"][0]
         self.rect = self.image.get_rect(topleft=(x, y))
         self.velocity_y = 0
@@ -58,6 +69,11 @@ class Player:
         self.death_frame = 0
         self.death_timer = 0
 
+        # Variables para la animación de victoria
+        self.is_winning = False
+        self.win_frame = 0
+        self.win_timer = 0
+
     def scale_image(self, path):
         """Carga y escala una imagen al tamaño de Peach"""
         image = pygame.image.load(path)
@@ -67,6 +83,10 @@ class Player:
         """Actualizar estado del personaje"""
         if self.is_dying:
             self.death_animation()
+            return
+
+        if self.is_winning:
+            self.win_animation()
             return
 
         keys = pygame.key.get_pressed()
@@ -141,6 +161,21 @@ class Player:
 
         self.image = self.sprites["dead"][self.death_frame]
 
+    def win(self):
+        """Inicia la animación de victoria"""
+        self.is_winning = True
+        self.win_frame = 0
+        self.win_timer = 0
+        self.velocity_y = 0  # Detiene el movimiento
+
+    def win_animation(self):
+        """Ejecuta la animación de victoria cuadro a cuadro."""
+        self.win_timer += 1
+        if self.win_timer % DEATH_ANIMATION_SPEED == 0:
+            self.win_frame = (self.win_frame + 1) % len(self.sprites["win"])
+
+        self.image = self.sprites["win"][self.win_frame]
+
     def reset(self):
         """Reinicia el personaje tras la muerte"""
         self.rect.topleft = (self.start_x, self.start_y)
@@ -154,3 +189,11 @@ class Player:
 
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
+        if self.is_winning:
+            self.draw_win_message(screen)
+
+    def draw_win_message(self, screen):
+        """Dibuja el mensaje de victoria en la pantalla"""
+        font = pygame.font.Font(None, 74)
+        text = font.render("¡Ganaste!", True, (255, 255, 255))
+        screen.blit(text, (self.rect.x, self.rect.y - 50))

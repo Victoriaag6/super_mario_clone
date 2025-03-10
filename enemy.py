@@ -3,6 +3,10 @@ import pygame
 class Enemy:
     def __init__(self, x, y, speed=2, size=(30, 30), frames_folder="assets/goomba/"):
         """Inicializa el enemigo con animación"""
+        # Guardar posición inicial para poder hacer reset
+        self.start_x = x
+        self.start_y = y
+        
         self.rect = pygame.Rect(x, y, *size)
         self.speed = speed
         self.direction = -1  # -1 significa que empieza moviéndose a la izquierda
@@ -34,7 +38,17 @@ class Enemy:
     def update(self):
         """Actualizar la posición y animación del enemigo"""
         if self.alive:
+            # Mover al enemigo
+            old_x = self.rect.x
             self.rect.x += self.speed * self.direction
+
+            # Verificar si sale de la pantalla (0, WIDTH)
+            if self.rect.left < 0 or self.rect.right > 800:
+                # Regresar a la posición anterior y cambiar de dirección
+                self.rect.x = old_x
+                self.change_direction()
+
+            # Animación de caminar
             self.frame_index += self.animation_speed
             if self.frame_index >= len(self.frames):
                 self.frame_index = 0
@@ -71,4 +85,8 @@ class Enemy:
         """Revive el enemigo cuando el juego se reinicia"""
         self.alive = True
         self.rect.x = self.start_x
+        self.rect.y = self.start_y
         self.image = self.frames[0]
+        self.death_index = 0
+        self.death_timer = 0
+        self.direction = -1
