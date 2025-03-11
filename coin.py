@@ -17,6 +17,10 @@ class Coin:
             pygame.transform.scale(pygame.image.load(frames_folder + "frame2.png"), size),
             pygame.transform.scale(pygame.image.load(frames_folder + "frame3.png"), size),
             pygame.transform.scale(pygame.image.load(frames_folder + "frame4.png"), size),
+            pygame.transform.scale(pygame.image.load(frames_folder + "frame5.png"), size),
+            pygame.transform.scale(pygame.image.load(frames_folder + "frame6.png"), size),
+            pygame.transform.scale(pygame.image.load(frames_folder + "frame7.png"), size),
+            pygame.transform.scale(pygame.image.load(frames_folder + "frame8.png"), size),
         ]
 
         self.image = self.frames[0]  # Imagen inicial

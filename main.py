@@ -52,7 +52,7 @@ victory_played = False
 defeat_played = False
 
 # --- PANTALLA 1 ---
-background1 = pygame.image.load("assets/fondo2.png")
+background1 = pygame.image.load("assets/fondo3.png")
 background1 = pygame.transform.scale(background1, (WIDTH, HEIGHT))
 platforms1 = [
     Platform(0, HEIGHT - 80, WIDTH, 80, "assets/suelo1.png"),  # Suelo principal
@@ -70,7 +70,7 @@ coins1 = [
 ]
 
 # --- PANTALLA 2 (Final) ---
-background2 = pygame.image.load("assets/fondo2.png")
+background2 = pygame.image.load("assets/fondo3.png")
 background2 = pygame.transform.scale(background2, (WIDTH, HEIGHT))
 # Escalera rellena de ladrillos (ejemplo de escalera similar al original)
 platforms2 = [
