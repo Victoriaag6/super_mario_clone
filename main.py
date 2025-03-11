@@ -46,6 +46,7 @@ sound_walk = pygame.mixer.Sound("assets/sounds/walk.mp3")
 sound_jump = pygame.mixer.Sound("assets/sounds/jump.mp3")
 sound_victory = pygame.mixer.Sound("assets/sounds/victory.mp3")
 sound_lose = pygame.mixer.Sound("assets/sounds/lose.mp3")
+sound_coin = pygame.mixer.Sound("assets/sounds/coin.mp3")  # Agregar sonido de la moneda
 walking_sound_playing = False
 victory_played = False
 defeat_played = False
@@ -177,6 +178,7 @@ while running:
                 coin.update()
                 if player.rect.colliderect(coin.rect) and not coin.collected:
                     coin.collect()
+                    sound_coin.play()  # Reproducir sonido de la moneda
                     score += 10
             for plat in platforms1:
                 plat.draw(screen)
@@ -222,6 +224,7 @@ while running:
             coin.update()
             if player.rect.colliderect(coin.rect) and not coin.collected:
                 coin.collect()
+                sound_coin.play()  # Reproducir sonido de la moneda
                 score += 10
             coin.draw(screen)
         if player.rect.colliderect(flag.rect):
