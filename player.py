@@ -74,6 +74,12 @@ class Player:
         self.win_frame = 0
         self.win_timer = 0
 
+        self.win_frames = self.sprites["win"]
+        self.win_frame_index = 0
+        self.win_animation_speed = 0.1
+        self.win_animation_counter = 0
+        self.winning = False
+
     def scale_image(self, path):
         """Carga y escala una imagen al tamaño de Peach"""
         image = pygame.image.load(path)
@@ -143,6 +149,13 @@ class Player:
             else:
                 self.image = self.sprites["idle"][0]
 
+        if self.winning:
+            self.win_animation_counter += self.win_animation_speed
+            if self.win_animation_counter >= 1:
+                self.win_animation_counter = 0
+                self.win_frame_index = (self.win_frame_index + 1) % len(self.win_frames)
+            self.image = self.win_frames[self.win_frame_index]
+
     def die(self):
         """Inicia la animación de muerte"""
         self.is_dying = True
@@ -175,6 +188,11 @@ class Player:
             self.win_frame = (self.win_frame + 1) % len(self.sprites["win"])
 
         self.image = self.sprites["win"][self.win_frame]
+
+    def start_win_animation(self):
+        self.winning = True
+        self.win_frame_index = 0
+        self.win_animation_counter = 0
 
     def reset(self):
         """Reinicia el personaje tras la muerte"""
