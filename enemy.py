@@ -35,7 +35,7 @@ class Enemy:
         self.death_index = 0
         self.death_timer = 0
 
-    def update(self):
+    def update(self, platforms):
         """Actualizar la posición y animación del enemigo"""
         if self.alive:
             # Mover al enemigo
@@ -55,6 +55,15 @@ class Enemy:
             self.image = self.frames[int(self.frame_index)]
         else:
             self.death_animation()
+
+        for platform in platforms:
+            if self.rect.colliderect(platform.rect):
+                if self.direction == 1 and self.rect.right > platform.rect.right:
+                    self.rect.right = platform.rect.right
+                    self.direction = -1
+                elif self.direction == -1 and self.rect.left < platform.rect.left:
+                    self.rect.left = platform.rect.left
+                    self.direction = 1
 
     def change_direction(self):
         """Invierte la dirección cuando choca con un límite"""

@@ -31,12 +31,22 @@ class Lava:
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
 
+# Clase Tunnel: similar a Platform pero con imagen de túnel
+class Tunnel:
+    def __init__(self, x, y, width, height, image_path="assets/tunel.png"):
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect.topleft)
+
 # Inicializar pygame y el mixer de audio
 pygame.init()
 pygame.mixer.init()
 
 # Constantes y configuración de pantalla
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1000, 600
 FPS = 60
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Super Mario Clone")
@@ -66,8 +76,10 @@ coin_blocks1 = [
     CoinBlock(510, 350, 40, 40),
 ]
 coins1 = [
-    Coin(360, 310, size=(20, 20))  # Nueva moneda encima de la plataforma flotante
+    Coin(360, 310, size=(20, 20)),  # Nueva moneda encima de la plataforma flotante
+    Coin(770, HEIGHT - 190, size=(20, 20))  # Nueva moneda encima del túnel
 ]
+tunnel1 = Tunnel(740, HEIGHT - 160, 80, 80, "assets/tunel.png")  # Añadir túnel
 
 # --- PANTALLA 2 (Final) ---
 background2 = pygame.image.load("assets/fondo3.png")
@@ -137,8 +149,13 @@ while running:
                 defeat_played = False
                 for enemy in enemies1:
                     enemy.reset()
-                coins1.clear()
-                coins2.clear()
+                coins1 = [
+                    Coin(360, 310, size=(20, 20)),  # Nueva moneda encima de la plataforma flotante
+                    Coin(770, HEIGHT - 190, size=(20, 20))  # Nueva moneda encima del túnel
+                ]
+                coins2 = [
+                    Coin(530, HEIGHT - 480, size=(20, 20))  # Nueva moneda encima de la lava
+                ]
         
         # Detectar salto y reproducir sonido
         if event.type == pygame.KEYDOWN:
@@ -170,7 +187,7 @@ while running:
         if player.alive:
             player.update(platforms1, coin_blocks1, enemies1)
             for enemy in enemies1:
-                enemy.update()  # Remove the extra argument
+                enemy.update(platforms1)  # Remove the extra argument
                 for plat in platforms1:
                     if enemy.rect.left <= plat.rect.left or enemy.rect.right >= plat.rect.right:
                         enemy.change_direction()
@@ -188,7 +205,12 @@ while running:
                 coin.draw(screen)
             for enemy in enemies1:
                 enemy.draw(screen)
-       
+            tunnel1.draw(screen)  # Dibujar túnel
+            if player.rect.colliderect(tunnel1.rect):
+                current_screen = 2
+                player.rect.x = 50
+                player.rect.y = HEIGHT - 150
+        
         player.draw(screen)
         score_text = font.render(f"Monedas: {score}", True, (255, 255, 0))
         screen.blit(score_text, (20, 20))
