@@ -64,7 +64,7 @@ enemies1 = [
 coin_blocks1 = [
     CoinBlock(510, 350, 40, 40),
 ]
-coins = [
+coins1 = [
     Coin(360, 310, size=(20, 20))  # Nueva moneda encima de la plataforma flotante
 ]
 
@@ -93,6 +93,11 @@ platforms2 = [
 lava = Lava(430, HEIGHT - 100, 250, 80, "assets/lava.png")
 # Crear la bandera final en la segunda pantalla
 flag = Flag(700, HEIGHT - 80 - 240, size=(100, 250), image_path="assets/flag.png")
+
+# Agregar una moneda encima de la lava
+coins2 = [
+    Coin(530, HEIGHT - 480, size=(20, 20))  # Nueva moneda encima de la lava
+]
 
 # Jugador y variables de juego
 player = Player(100, HEIGHT - 150)
@@ -131,7 +136,8 @@ while running:
                 defeat_played = False
                 for enemy in enemies1:
                     enemy.reset()
-                coins.clear()
+                coins1.clear()
+                coins2.clear()
         
         # Detectar salto y reproducir sonido
         if event.type == pygame.KEYDOWN:
@@ -158,7 +164,7 @@ while running:
             if player.rect.colliderect(block.rect) and player.velocity_y < 0:
                 new_coin = block.hit()
                 if new_coin:
-                    coins.append(new_coin)
+                    coins1.append(new_coin)
         
         if player.alive:
             player.update(platforms1, coin_blocks1, enemies1)
@@ -167,7 +173,7 @@ while running:
                 for plat in platforms1:
                     if enemy.rect.left <= plat.rect.left or enemy.rect.right >= plat.rect.right:
                         enemy.change_direction()
-            for coin in coins:
+            for coin in coins1:
                 coin.update()
                 if player.rect.colliderect(coin.rect) and not coin.collected:
                     coin.collect()
@@ -176,7 +182,7 @@ while running:
                 plat.draw(screen)
             for block in coin_blocks1:
                 block.draw(screen)
-            for coin in coins:
+            for coin in coins1:
                 coin.draw(screen)
             for enemy in enemies1:
                 enemy.draw(screen)
@@ -205,9 +211,19 @@ while running:
         flag.draw(screen)
         if player.alive:
             player.update(platforms2, [], [])
+            # Detección de colisión con la lava
+            if player.rect.colliderect(lava.rect):
+                player.alive = False
+                sound_lose.play()
         player.draw(screen)
         score_text = font.render(f"Monedas: {score}", True, (255, 255, 0))
         screen.blit(score_text, (20, 20))
+        for coin in coins2:
+            coin.update()
+            if player.rect.colliderect(coin.rect) and not coin.collected:
+                coin.collect()
+                score += 10
+            coin.draw(screen)
         if player.rect.colliderect(flag.rect):
             win = True
             if not victory_played:
