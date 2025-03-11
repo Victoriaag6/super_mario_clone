@@ -208,6 +208,7 @@ while running:
             if not victory_played:
                 sound_victory.play()
                 victory_played = True
+            player.win()  # Llamar al método de victoria del jugador
 
     # --- Victoria ---
     if win:
