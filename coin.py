@@ -1,7 +1,7 @@
 import pygame
 
 class Coin:
-    def __init__(self, x, y, size=(30, 30), frames_folder="assets/coin/", bounce=False):
+    def __init__(self, x, y, size=(20, 20), frames_folder="assets/coin/", bounce=False):
         """Inicializa la moneda animada con opción de rebote"""
         self.rect = pygame.Rect(x, y, *size)  # Tamaño ajustado
         self.frame_index = 0

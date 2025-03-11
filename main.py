@@ -58,10 +58,15 @@ platforms1 = [
     Platform(250, 350, 260, 40, "assets/brick.jpg")             # Plataforma flotante
 ]
 enemies1 = [
-    Enemy(320, HEIGHT - 120, speed=2, size=(40, 40), frames_folder="assets/goomba/")
+    Enemy(320, HEIGHT - 120, speed=2, size=(40, 40), frames_folder="assets/goomba/"),
+    # Enemy(360, 310, speed=2, size=(40, 40), frames_folder="assets/goomba/")           # Goomba sobre la plataforma flotante
 ]
-coin_blocks1 = [CoinBlock(510, 350, 40, 40)]
-coins = []
+coin_blocks1 = [
+    CoinBlock(510, 350, 40, 40),
+]
+coins = [
+    Coin(360, 310, size=(20, 20))  # Nueva moneda encima de la plataforma flotante
+]
 
 # --- PANTALLA 2 (Final) ---
 background2 = pygame.image.load("assets/fondo2.png")
